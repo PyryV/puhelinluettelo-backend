@@ -6,7 +6,6 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
-const mongoose = require('mongoose')
 const Person = require('./models/person')
 
 app.use(bodyParser.json())
@@ -15,17 +14,17 @@ app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
 morgan.token('content', 
-  function (req, res) {
-    if(JSON.stringify(req.body) === '{}') {
-      return ""
+  function (request) {
+    if(JSON.stringify(request.body) === '{}') {
+      return ''
     }
-    return JSON.stringify(req.body)
+    return JSON.stringify(request.body)
   }
 )
 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
-  if (body.name === undefined || body.number === undefined) {
+  if (body.name === undefined ||body.number === undefined) {
     return response.status(400).json({ error: 'name or number missing' })
   }
   const person = new Person({
@@ -41,6 +40,7 @@ app.post('/api/persons', (request, response, next) => {
 })
 
 const errorHandler = (error, request, response, next) => {
+  // eslint-disable-next-line no-console
   console.error(error.message)
 
   if(error.name === 'CastError' && error.kind === 'ObjectId') {
@@ -57,22 +57,22 @@ app.use(errorHandler)
 let persons = [
   {
     id: 1,
-    name: "Allu Aamuinen",
-    number: "040-1234567"
+    name: 'Allu Aamuinen',
+    number: '040-1234567'
   },
   {
     id: 2,
-    name: "Ville Vilkas",
-    number: "050-1234567"
+    name: 'Ville Vilkas',
+    number: '050-1234567'
   },
   {
     id: 3,
-    name: "Teemu Touhukas",
-    number: "040-1212121"
+    name: 'Teemu Touhukas',
+    number: '040-1212121'
   }
 ]
 
-app.get('/api/persons', (request,response) => {
+app.get('/api/persons', (request,response, next) => {
   Person.find({})
     .then(persons => {
       response.json(persons)
@@ -94,7 +94,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))

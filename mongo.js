@@ -20,12 +20,6 @@ const personSchema = new mongoose.Schema({
   number: String
 })
 
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String
-})
-
-const Person = mongoose.model('Person', personSchema)
 
 const Person = mongoose.model('Person', personSchema)
 
@@ -34,7 +28,7 @@ const person = new Person({
   number: number
 })
 
-if(name === undefined || number === undefined) {
+if(name === undefined ||number === undefined) {
   console.log('puhelinluettelo:')
   Person.find({}).then(result => {
     result.forEach(person => {
@@ -43,7 +37,7 @@ if(name === undefined || number === undefined) {
     mongoose.connection.close()
   })
 } else {
-  person.save().then(response => {
+  person.save().then(() => {
     console.log('lisätään ', name, ' numero ', number, ' luetteloon');
     mongoose.connection.close();
   })
